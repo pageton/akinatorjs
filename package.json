@@ -1,6 +1,6 @@
 {
-    "name": "akinator",
-    "version": "1.0.0",
+    "name": "akinatorjs",
+    "version": "1.0.1",
     "description": "Akinator game library for Node.js",
     "main": "dist/main.js",
     "type": "module",
