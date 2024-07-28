@@ -1,4 +1,4 @@
-import { Answer } from "./enum";
+import { Answer } from "./object";
 
 export interface ResponseStart {
     ok: boolean;
@@ -28,7 +28,7 @@ export interface AkinatorHeaders {
 }
 
 export type AnswerAlternatives =
-    | Answer
+    | keyof typeof Answer
     | "y"
     | "yes"
     | "n"

@@ -1,3 +1,2 @@
-export * from "./enum";
-export * from "./types";
-export * from "./main";
+export { AkinatorLanguage as Language } from "./object";
+export { Akinator } from "./main";

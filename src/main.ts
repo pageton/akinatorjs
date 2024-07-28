@@ -1,13 +1,25 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 import { ResponseStart, ResponseAnswer, AnswerAlternatives } from "./types";
-import { AkinatorLanguage, Answer, AkinatorUrlType } from "./enum";
+import { AkinatorLanguage, Answer, AkinatorUrlType } from "./object";
 import fs from "fs/promises";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 
-function normalizeAnswer(answer: AnswerAlternatives): Answer {
-    switch (answer) {
+type AkinatorLanguageType =
+    (typeof AkinatorLanguage)[keyof typeof AkinatorLanguage];
+type AkinatorUrlTypeType =
+    (typeof AkinatorUrlType)[keyof typeof AkinatorUrlType];
+
+function normalizeAnswer(answer: AnswerAlternatives): number {
+    if (typeof answer === "number") {
+        if (Object.values(Answer).includes(answer)) {
+            return answer;
+        }
+        throw new Error("Invalid answer");
+    }
+
+    switch (answer.toLowerCase()) {
         case "y":
         case "yes":
             return Answer.Yes;
@@ -24,7 +36,10 @@ function normalizeAnswer(answer: AnswerAlternatives): Answer {
         case "probably not":
             return Answer.ProbablyNot;
         default:
-            return answer;
+            if (answer in Answer) {
+                return Answer[answer as keyof typeof Answer];
+            }
+            throw new Error("Invalid answer");
     }
 }
 
@@ -128,7 +143,7 @@ export class Akinator {
     private readonly headers: { [key: string]: string };
 
     constructor(
-        language: AkinatorLanguage = AkinatorLanguage.English,
+        language: AkinatorLanguageType = AkinatorLanguage.English,
         childMode: boolean = false
     ) {
         this.baseUrl = this.getUrl(language, AkinatorUrlType.Game);
@@ -147,8 +162,8 @@ export class Akinator {
     }
 
     private getUrl(
-        language: AkinatorLanguage,
-        urlType: AkinatorUrlType
+        language: AkinatorLanguageType,
+        urlType: AkinatorUrlTypeType
     ): string {
         return `https://${language}.akinator.com/${urlType}`;
     }
