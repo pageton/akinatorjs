@@ -3,7 +3,7 @@
     "version": "1.0.3",
     "description": "Akinator game library for Node.js",
     "main": "dist/main.js",
-    "types": "dist/types/main.d.ts",
+    "types": "dist/types/index.d.ts",
     "type": "module",
     "author": {
         "name": "Dev Rio",
