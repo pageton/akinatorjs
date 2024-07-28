@@ -14,9 +14,7 @@
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "isolatedModules": true,
-        "allowSyntheticDefaultImports": true,
-        "declaration": true,
-        "declarationDir": "./dist/types"
+        "allowSyntheticDefaultImports": true
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "dist"]
