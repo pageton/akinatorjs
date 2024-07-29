@@ -54,21 +54,21 @@ class AkinatorCache {
     }
     async set(key, value) {
         try {
-            const cacheObject = await this.loadFromFile();
-            if (cacheObject[key]) {
-                cacheObject[key].data = value;
-                cacheObject[key].expiry = Date.now() + this.cacheDuration;
-            }
-            else {
-                cacheObject[key] = {
-                    data: value,
-                    expiry: Date.now() + this.cacheDuration
-                };
-            }
+            let cacheObject = await this.loadFromFile();
+            cacheObject[key] = {
+                data: value,
+                expiry: Date.now() + this.cacheDuration
+            };
             await this.saveToFile(cacheObject);
         }
         catch (error) {
-            console.error("Error setting cache item:", error);
+            if (error instanceof Error && error.message.includes("ENOENT")) {
+                await this.saveToFile({});
+                await this.set(key, value);
+            }
+            else {
+                console.error("Error setting cache item:", error);
+            }
         }
     }
     async get(key) {
@@ -96,16 +96,28 @@ class AkinatorCache {
         }
     }
     async saveToFile(cacheObject) {
-        await fs.writeFile(this.cacheFile, JSON.stringify(cacheObject, null, 2), "utf-8");
+        try {
+            await this.ensureCacheDir();
+            await fs.writeFile(this.cacheFile, JSON.stringify(cacheObject, null, 2), "utf-8");
+        }
+        catch (error) {
+            console.error("Error saving cache to file:", error);
+        }
     }
     async loadFromFile() {
         try {
+            await this.ensureCacheDir();
             const data = await fs.readFile(this.cacheFile, "utf-8");
             return JSON.parse(data);
         }
         catch (error) {
-            console.error("Error loading cache from file:", error);
-            return {};
+            if (error instanceof Error && error.message.includes("ENOENT")) {
+                return {};
+            }
+            else {
+                console.error("Error loading cache from file:", error);
+                return {};
+            }
         }
     }
     async clearCache() {
