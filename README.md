@@ -4,7 +4,7 @@ Akinator is a Node.js library for interacting with the Akinator web game. It all
 
 ## Installation
 
-To install the Akinator library, use npm:
+To install the Akinator library, use [npm](https://www.npmjs.com/package/akinatorjs):
 
 ```bash
 npm install akinatorjs
@@ -15,9 +15,9 @@ npm install akinatorjs
 To use the Akinator library, import the `Akinator` class and create an instance:
 
 ```javascript
-import { Akinator, AkinatorLanguage } from "akinator";
+import { Akinator, Language } from "akinator";
 
-const akinator = new Akinator(AkinatorLanguage.English);
+const akinator = new Akinator(Language.English);
 ```
 
 ### Starting a New Game
