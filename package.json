@@ -1,8 +1,9 @@
 {
     "name": "akinatorjs",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Akinator game library for Node.js",
     "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "type": "module",
     "author": {
         "name": "Dev Rio",
@@ -28,7 +29,6 @@
         "@types/axios": "^0.14.0",
         "@types/node": "^20.14.12",
         "@types/uuid": "^10.0.0",
-        "tsx": "^4.16.2",
         "typescript": "^5.5.4"
     },
     "repository": {
