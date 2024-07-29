@@ -47,7 +47,8 @@ class AkinatorCache {
     async ensureCacheDir() {
         try {
             await fs.mkdir(this.cacheDir, { recursive: true });
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Error creating cache directory:", error);
         }
     }
@@ -57,14 +58,16 @@ class AkinatorCache {
             if (cacheObject[key]) {
                 cacheObject[key].data = value;
                 cacheObject[key].expiry = Date.now() + this.cacheDuration;
-            } else {
+            }
+            else {
                 cacheObject[key] = {
                     data: value,
                     expiry: Date.now() + this.cacheDuration
                 };
             }
             await this.saveToFile(cacheObject);
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Error setting cache item:", error);
         }
     }
@@ -76,7 +79,8 @@ class AkinatorCache {
                 return item.data;
             }
             return null;
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Error getting cache item:", error);
             return null;
         }
@@ -86,22 +90,20 @@ class AkinatorCache {
             const cacheObject = await this.loadFromFile();
             delete cacheObject[key];
             await this.saveToFile(cacheObject);
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Error deleting cache item:", error);
         }
     }
     async saveToFile(cacheObject) {
-        await fs.writeFile(
-            this.cacheFile,
-            JSON.stringify(cacheObject, null, 2),
-            "utf-8"
-        );
+        await fs.writeFile(this.cacheFile, JSON.stringify(cacheObject, null, 2), "utf-8");
     }
     async loadFromFile() {
         try {
             const data = await fs.readFile(this.cacheFile, "utf-8");
             return JSON.parse(data);
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Error loading cache from file:", error);
             return {};
         }
@@ -109,7 +111,8 @@ class AkinatorCache {
     async clearCache() {
         try {
             await fs.unlink(this.cacheFile);
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Error clearing cache:", error);
         }
     }
@@ -136,8 +139,7 @@ export class Akinator {
         this.id = uuidv4();
         this.childMode = childMode;
         this.headers = {
-            "user-agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
         };
     }
     getUrl(language, urlType) {
@@ -145,22 +147,16 @@ export class Akinator {
     }
     async startGame() {
         try {
-            const response = await axios.post(
-                this.baseUrl,
-                new URLSearchParams({
-                    cm: this.childMode.toString(),
-                    sid: "1"
-                }),
-                {
-                    headers: this.headers
-                }
-            );
+            const response = await axios.post(this.baseUrl, new URLSearchParams({
+                cm: this.childMode.toString(),
+                sid: "1"
+            }), {
+                headers: this.headers
+            });
             const $ = cheerio.load(response.data);
             this.question = $("#question-label").text();
             this.session = $('form#askSoundlike input[name="session"]').val();
-            this.signature = $(
-                'form#askSoundlike input[name="signature"]'
-            ).val();
+            this.signature = $('form#askSoundlike input[name="signature"]').val();
             if (!this.session || !this.signature) {
                 return {
                     ok: false,
@@ -182,13 +178,13 @@ export class Akinator {
                     question: this.question
                 }
             };
-        } catch (error) {
+        }
+        catch (error) {
             console.error("Error in startGame:", error);
             return {
                 ok: false,
                 result: {
-                    error:
-                        error instanceof Error ? error.message : String(error)
+                    error: error instanceof Error ? error.message : String(error)
                 }
             };
         }
@@ -198,27 +194,21 @@ export class Akinator {
             const normalizedAnswer = normalizeAnswer(answer);
             const cacheItem = await this.cache.get(id);
             if (!cacheItem) {
-                throw new Error(
-                    "Game session not found. Please start a new game."
-                );
+                throw new Error("Game session not found. Please start a new game.");
             }
-            const response = await axios.post(
-                this.answerUrl,
-                new URLSearchParams({
-                    step: cacheItem.step.toString(),
-                    progression: cacheItem.progress.toString(),
-                    answer: normalizedAnswer.toString(),
-                    session: cacheItem.session,
-                    signature: cacheItem.signature,
-                    question_filter: "string",
-                    sid: "NaN",
-                    cm: this.childMode.toString(),
-                    step_last_proposition: ""
-                }),
-                {
-                    headers: this.headers
-                }
-            );
+            const response = await axios.post(this.answerUrl, new URLSearchParams({
+                step: cacheItem.step.toString(),
+                progression: cacheItem.progress.toString(),
+                answer: normalizedAnswer.toString(),
+                session: cacheItem.session,
+                signature: cacheItem.signature,
+                question_filter: "string",
+                sid: "NaN",
+                cm: this.childMode.toString(),
+                step_last_proposition: ""
+            }), {
+                headers: this.headers
+            });
             if (response.data && !response.data.valide_contrainte) {
                 await this.cache.set(id, {
                     ...cacheItem,
@@ -234,7 +224,8 @@ export class Akinator {
                         question: response.data.question
                     }
                 };
-            } else if (response.data && response.data.valide_contrainte) {
+            }
+            else if (response.data && response.data.valide_contrainte) {
                 await this.cache.delete(id);
                 return {
                     ok: true,
@@ -245,15 +236,16 @@ export class Akinator {
                         name: response.data.name_proposition
                     }
                 };
-            } else {
+            }
+            else {
                 throw new Error("No data received from Akinator API");
             }
-        } catch (error) {
+        }
+        catch (error) {
             return {
                 ok: false,
                 result: {
-                    error:
-                        error instanceof Error ? error.message : String(error)
+                    error: error instanceof Error ? error.message : String(error)
                 }
             };
         }
@@ -262,23 +254,17 @@ export class Akinator {
         try {
             const cacheItem = await this.cache.get(id);
             if (!cacheItem) {
-                throw new Error(
-                    "Game session not found. Please start a new game."
-                );
+                throw new Error("Game session not found. Please start a new game.");
             }
-            const response = await axios.post(
-                this.backUrl,
-                new URLSearchParams({
-                    step: cacheItem.step.toString(),
-                    progression: cacheItem.progress.toString(),
-                    session: cacheItem.session,
-                    signature: cacheItem.signature,
-                    cm: this.childMode.toString()
-                }),
-                {
-                    headers: this.headers
-                }
-            );
+            const response = await axios.post(this.backUrl, new URLSearchParams({
+                step: cacheItem.step.toString(),
+                progression: cacheItem.progress.toString(),
+                session: cacheItem.session,
+                signature: cacheItem.signature,
+                cm: this.childMode.toString()
+            }), {
+                headers: this.headers
+            });
             if (response.data) {
                 await this.cache.set(id, {
                     ...cacheItem,
@@ -294,15 +280,16 @@ export class Akinator {
                         question: response.data.question
                     }
                 };
-            } else {
+            }
+            else {
                 throw new Error("No data received from Akinator API");
             }
-        } catch (error) {
+        }
+        catch (error) {
             return {
                 ok: false,
                 result: {
-                    error:
-                        error instanceof Error ? error.message : String(error)
+                    error: error instanceof Error ? error.message : String(error)
                 }
             };
         }
